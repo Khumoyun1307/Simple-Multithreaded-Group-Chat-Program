@@ -1,3 +1,4 @@
+// chat-client/src/main/java/com/example/chat/client/ui/MainApp.java
 package com.example.chat.client.ui;
 
 import com.example.chat.common.Config;
@@ -6,178 +7,113 @@ import com.example.chat.common.MessageType;
 import com.example.chat.client.ChatClient;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 /**
- * JavaFX application providing a modern GUI for the chat client.
+ * Main application launcher that manages scene switching between Login and Chat views.
  */
 public class MainApp extends Application {
     private Stage primaryStage;
-    private Scene loginScene;
-    private Scene chatScene;
-
-    // Login controls
-    private TextField hostField;
-    private TextField portField;
-    private TextField userField;
-    private Button connectButton;
-
-    // Chat controls
-    private ObservableList<String> messages;
-    private ListView<String> messageListView;
-    private TextField inputField;
-    private Button sendButton;
-
-    // Networking
     private ChatClient client;
     private String username;
 
     @Override
-    public void start(Stage stage) {
-        this.primaryStage = stage;
-        primaryStage.setTitle("Chat Application");
-
-        initLoginScene();
-        primaryStage.setScene(loginScene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        this.primaryStage.setTitle("Chat Application");
+        showLoginView();
     }
 
-    private void initLoginScene() {
-        // Load defaults from config
-        Config cfg = new Config("/chat-client.properties");
-        String defaultHost = cfg.get("client.host", "localhost");
-        int defaultPort = cfg.getInt("client.port", 1234);
-
-        Label title = new Label("Welcome to Chat");
-        title.setFont(Font.font(24));
-
-        hostField = new TextField(defaultHost);
-        hostField.setPromptText("Server Host");
-        portField = new TextField(String.valueOf(defaultPort));
-        portField.setPromptText("Port");
-        userField = new TextField();
-        userField.setPromptText("Username");
-
-        connectButton = new Button("Connect");
-        connectButton.setDefaultButton(true);
-        connectButton.setOnAction(evt -> connect());
-
-        VBox vbox = new VBox(10, title, hostField, portField, userField, connectButton);
-        vbox.setPadding(new Insets(20));
-        vbox.setAlignment(Pos.CENTER);
-
-        loginScene = new Scene(vbox);
-    }
-
-    private void initChatScene() {
-        messages = FXCollections.observableArrayList();
-        messageListView = new ListView<>(messages);
-        messageListView.setPrefSize(400, 300);
-
-        inputField = new TextField();
-        inputField.setPromptText("Type your message...");
-        inputField.setPrefWidth(300);
-        inputField.setOnAction(evt -> sendMessage());
-
-        sendButton = new Button("Send");
-        sendButton.setOnAction(evt -> sendMessage());
-
-        HBox inputBox = new HBox(10, inputField, sendButton);
-        inputBox.setPadding(new Insets(10));
-        inputBox.setAlignment(Pos.CENTER);
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(messageListView);
-        borderPane.setBottom(inputBox);
-
-        chatScene = new Scene(borderPane, 420, 360);
-    }
-
-    private void connect() {
-        String host = hostField.getText().trim();
-        int port;
+    /**
+     * Loads and displays the Login view.
+     */
+    public void showLoginView() {
         try {
-            port = Integer.parseInt(portField.getText().trim());
-        } catch (NumberFormatException e) {
-            showAlert("Invalid port number.");
-            return;
-        }
-        username = userField.getText().trim();
-        if (username.isEmpty()) {
-            showAlert("Username cannot be empty.");
-            return;
-        }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
+            Parent root = loader.load();
 
+            // Give controller a reference back to this MainApp
+            LoginController controller = loader.getController();
+            controller.setMainApp(this);
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
+
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * After login, initialize ChatClient and display the Chat view.
+     * @param host the server host
+     * @param port the server port
+     * @param username the chosen username
+     */
+    public void showChatView(String host, int port, String username) {
+        this.username = username;
         try {
+            // Initialize client connection
             client = new ChatClient(host, port);
             client.connect();
-            // send JOIN
             client.send(new Message(username, "ALL", MessageType.JOIN, ""));
 
-            initChatScene();
-            primaryStage.setScene(chatScene);
+            // Load Chat view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ChatView.fxml"));
+            Parent root = loader.load();
 
-            // start listener thread
-            new Thread(this::receiveMessages, "ui-receiver").start();
+            // Give controller access to MainApp and networking
+            ChatController controller = loader.getController();
+            controller.setMainApp(this);
+            controller.initClient(client, username);
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
+
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(true);
+            primaryStage.sizeToScene();
+            primaryStage.show();
+
+            // Start listening for messages
+            controller.startListener();
         } catch (IOException e) {
-            showAlert("Failed to connect to server: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void receiveMessages() {
-        try {
-            while (true) {
-                Message msg = client.receive();
-                if (msg == null) continue;
-                switch (msg.getType()) {
-                    case PING:
-                        // auto-respond
-                        client.send(new Message(username, "SERVER", MessageType.PONG, ""));
-                        break;
-                    case PONG:
-                        // ignore
-                        break;
-                    default:
-                        String text = String.format("%s: %s", msg.getFrom(), msg.getBody());
-                        Platform.runLater(() -> messages.add(text));
-                }
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    private void sendMessage() {
-        String text = inputField.getText().trim();
-        if (text.isEmpty()) return;
-        client.send(new Message(username, "ALL", MessageType.TEXT, text));
-        inputField.clear();
-    }
-
-    private void showAlert(String msg) {
+    /**
+     * Displays an error alert dialog on the JavaFX Application thread.
+     * @param message the error message to show
+     */
+    public void showAlert(String message) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
+            alert.initOwner(primaryStage);
             alert.showAndWait();
         });
     }
 
     @Override
     public void stop() {
-        // send LEAVE and disconnect
+        // Clean up connection
         if (client != null) {
-            client.send(new Message(username, "ALL", MessageType.LEAVE, ""));
-            client.disconnect();
+            try {
+                client.send(new Message(username, "ALL", MessageType.LEAVE, ""));
+                client.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
