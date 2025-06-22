@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+
+<VBox fx:controller="com.example.chat.client.ui.LoginController"
+      spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml">
+    <Label text="Welcome to Chat" styleClass="title"/>
+    <TextField fx:id="hostField" promptText="Server Host"/>
+    <TextField fx:id="portField" promptText="Port"/>
+    <TextField fx:id="userField" promptText="Username"/>
+    <Button fx:id="connectButton" text="Connect" onAction="#onConnect"/>
+</VBox>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<BorderPane fx:controller="com.example.chat.client.ui.ChatController"
+            xmlns:fx="http://javafx.com/fxml">
+    <center>
+        <ListView fx:id="messageList" prefWidth="400" prefHeight="300"/>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="inputField" promptText="Type your message..."/>
+            <Button fx:id="sendButton" text="Send" onAction="#onSend"/>
+        </HBox>
+    </bottom>
+</BorderPane>
