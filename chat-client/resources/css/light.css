@@ -1,0 +1,22 @@
+/* light.css */
+.top-bar {
+  -fx-background-color: #f5f5f5;
+}
+.app-title {
+  -fx-text-fill: #333333;
+}
+.sidebar {
+  -fx-background-color: #ffffff;
+}
+.sidebar-header {
+  -fx-text-fill: #666666;
+}
+.chat-area {
+  -fx-background-color: #e7e7e7;
+}
+.input-area {
+  -fx-background-color: #ffffff;
+}
+.send-button {
+  /* if you want a different button background, add it here */
+}

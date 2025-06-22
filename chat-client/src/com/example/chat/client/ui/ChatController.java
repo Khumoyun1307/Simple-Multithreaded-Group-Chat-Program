@@ -6,21 +6,33 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 
 /**
  * Controller for ChatView.fxml. Binds the ListView to the service’s ObservableList,
  * and delegates send/stop actions to ChatService.
  */
 public class ChatController {
+
+    @FXML private TextField  searchField;
+    @FXML private ListView<String> chatList;
+
     @FXML private ListView<String> messageList;
     @FXML private TextField inputField;
     @FXML private Button sendButton;
+    @FXML private ToggleButton themeToggle;
 
     private MainApp mainApp;
     private ChatService chatService;
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
+    }
+
+    @FXML
+    private void onToggleTheme() {
+        themeToggle.setText(themeToggle.isSelected() ? "Light Mode" : "Dark Mode");
+        mainApp.toggleTheme();
     }
 
     /**

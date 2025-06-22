@@ -1,0 +1,22 @@
+/* dark.css */
+.top-bar {
+  -fx-background-color: #2b2b2b;
+}
+.app-title {
+  -fx-text-fill: #dddddd;
+}
+.sidebar {
+  -fx-background-color: #1f1f1f;
+}
+.sidebar-header {
+  -fx-text-fill: #aaaaaa;
+}
+.chat-area {
+  -fx-background-color: #121212;
+}
+.input-area {
+  -fx-background-color: #1f1f1f;
+}
+.send-button {
+  /* dark-mode button styling if needed */
+}

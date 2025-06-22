@@ -1,16 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<BorderPane fx:controller="com.example.chat.client.ui.ChatController"
-            xmlns:fx="http://javafx.com/fxml">
-    <center>
-        <ListView fx:id="messageList" prefWidth="400" prefHeight="300"/>
-    </center>
-    <bottom>
-        <HBox spacing="10" alignment="CENTER">
-            <TextField fx:id="inputField" promptText="Type your message..."/>
-            <Button fx:id="sendButton" text="Send" onAction="#onSend"/>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.chat.client.ui.ChatController"
+            styleClass="root-pane">
+
+    <!-- Top bar with theme toggle -->
+    <top>
+        <HBox spacing="10"
+              styleClass="top-bar"
+              alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="Chat App" styleClass="app-title"/>
+            <ToggleButton fx:id="themeToggle"
+                          text="Dark Mode"
+                          onAction="#onToggleTheme"/>
         </HBox>
-    </bottom>
+    </top>
+
+    <!-- Left sidebar -->
+    <left>
+        <VBox spacing="15"
+              styleClass="sidebar">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <TextField fx:id="searchField"
+                       promptText="Search..."
+                       styleClass="search-box"/>
+            <Separator/>
+            <Label text="Chats"
+                   styleClass="sidebar-header"/>
+            <ListView fx:id="chatList"
+                      styleClass="chat-list"/>
+        </VBox>
+    </left>
+
+    <!-- Center chat area -->
+    <center>
+        <VBox spacing="5"
+              styleClass="chat-area">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <ListView fx:id="messageList"
+                      styleClass="message-list"
+                      VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10"
+                  styleClass="input-area">
+                <padding>
+                    <Insets top="5" right="5" bottom="5" left="5"/>
+                </padding>
+
+                <TextField fx:id="inputField"
+                           promptText="Type a message…"
+                           HBox.hgrow="ALWAYS"/>
+                <Button fx:id="sendButton"
+                        text="Send"
+                        onAction="#onSend"
+                        styleClass="send-button"/>
+            </HBox>
+        </VBox>
+    </center>
+
 </BorderPane>

@@ -1,4 +1,3 @@
-// src/com/example/chat/client/ui/MainApp.java
 package com.example.chat.client.ui;
 
 import com.example.chat.client.service.ChatService;
@@ -15,6 +14,12 @@ import java.io.IOException;
 public class MainApp extends Application {
     private Stage primaryStage;
     private ChatService chatService;
+
+    private static final String LIGHT = "/css/light.css";
+    private static final String DARK  = "/css/dark.css";
+
+    private Scene chatScene;
+    private boolean darkMode = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -37,7 +42,7 @@ public class MainApp extends Application {
             primaryStage.setResizable(false);
             primaryStage.show();
         } catch (IOException e) {
-            showAlert("Failed to load Login view: " + e.getMessage());
+            showAlert("Failed to load Login view:\n" + e.getMessage());
         }
     }
 
@@ -54,16 +59,29 @@ public class MainApp extends Application {
             controller.setMainApp(this);
             controller.initService(chatService);
 
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
+            // 3) Apply stylesheets (base + default theme)
+            chatScene = new Scene(root);
+            chatScene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
+            chatScene.getStylesheets().add(getClass().getResource(LIGHT).toExternalForm());
 
-            primaryStage.setScene(scene);
+            primaryStage.setScene(chatScene);
             primaryStage.setResizable(true);
-            primaryStage.sizeToScene();
             primaryStage.show();
         } catch (IOException e) {
-            showAlert("Failed to start chat service: " + e.getMessage());
+            showAlert("Failed to start chat service:\n" + e.getMessage());
         }
+    }
+
+    public void toggleTheme() {
+        darkMode = !darkMode;
+        // Clear both theme sheets, then add the one you want
+        chatScene.getStylesheets().removeAll(
+                getClass().getResource(LIGHT).toExternalForm(),
+                getClass().getResource(DARK).toExternalForm()
+        );
+        chatScene.getStylesheets().add(
+                getClass().getResource(darkMode ? DARK : LIGHT).toExternalForm()
+        );
     }
 
     public void showAlert(String message) {

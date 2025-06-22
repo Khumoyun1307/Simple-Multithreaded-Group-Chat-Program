@@ -1,14 +1,31 @@
-.root {
+/* base.css — just the selectors, no colors */
+.root-pane {
   -fx-font-family: "Segoe UI", sans-serif;
-  -fx-font-size: 14px;
 }
-.title {
-  -fx-font-size: 24px;
-  -fx-font-weight: bold;
+.top-bar {
+  -fx-padding: 8;
 }
-.button {
+.app-title {
+  -fx-font-size: 18px;
+}
+.sidebar {
+  -fx-pref-width: 200px;
+}
+.search-box {
   -fx-background-radius: 4;
 }
-.text-field {
+.sidebar-header {
+  -fx-font-size: 14px;
+}
+.chat-area {
+  /* nothing here, color comes from theme */
+}
+.message-list {
+  -fx-background-color: transparent;
+}
+.input-area {
+  -fx-padding: 8;
+}
+.send-button {
   -fx-background-radius: 4;
 }
