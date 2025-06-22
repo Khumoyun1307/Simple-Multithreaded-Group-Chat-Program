@@ -1,12 +1,8 @@
-// chat-client/src/main/java/com/example/chat/client/ui/MainApp.java
+// src/com/example/chat/client/ui/MainApp.java
 package com.example.chat.client.ui;
 
-import com.example.chat.common.Config;
-import com.example.chat.common.Message;
-import com.example.chat.common.MessageType;
-import com.example.chat.client.ChatClient;
+import com.example.chat.client.service.ChatService;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,13 +12,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * Main application launcher that manages scene switching between Login and Chat views.
- */
 public class MainApp extends Application {
     private Stage primaryStage;
-    private ChatClient client;
-    private String username;
+    private ChatService chatService;
 
     @Override
     public void start(Stage primaryStage) {
@@ -31,15 +23,10 @@ public class MainApp extends Application {
         showLoginView();
     }
 
-    /**
-     * Loads and displays the Login view.
-     */
     public void showLoginView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
             Parent root = loader.load();
-
-            // Give controller a reference back to this MainApp
             LoginController controller = loader.getController();
             controller.setMainApp(this);
 
@@ -50,32 +37,22 @@ public class MainApp extends Application {
             primaryStage.setResizable(false);
             primaryStage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Failed to load Login view: " + e.getMessage());
         }
     }
 
-    /**
-     * After login, initialize ChatClient and display the Chat view.
-     * @param host the server host
-     * @param port the server port
-     * @param username the chosen username
-     */
     public void showChatView(String host, int port, String username) {
-        this.username = username;
         try {
-            // Initialize client connection
-            client = new ChatClient(host, port);
-            client.connect();
-            client.send(new Message(username, "ALL", MessageType.JOIN, ""));
+            // 1) Create and start the service
+            chatService = new ChatService(host, port, username);
+            chatService.start();
 
-            // Load Chat view
+            // 2) Load the Chat.fxml and wire the controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ChatView.fxml"));
             Parent root = loader.load();
-
-            // Give controller access to MainApp and networking
             ChatController controller = loader.getController();
             controller.setMainApp(this);
-            controller.initClient(client, username);
+            controller.initService(chatService);
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
@@ -84,36 +61,21 @@ public class MainApp extends Application {
             primaryStage.setResizable(true);
             primaryStage.sizeToScene();
             primaryStage.show();
-
-            // Start listening for messages
-            controller.startListener();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Failed to start chat service: " + e.getMessage());
         }
     }
 
-    /**
-     * Displays an error alert dialog on the JavaFX Application thread.
-     * @param message the error message to show
-     */
     public void showAlert(String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-            alert.initOwner(primaryStage);
-            alert.showAndWait();
-        });
+        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
+        alert.initOwner(primaryStage);
+        alert.showAndWait();
     }
 
     @Override
     public void stop() {
-        // Clean up connection
-        if (client != null) {
-            try {
-                client.send(new Message(username, "ALL", MessageType.LEAVE, ""));
-                client.disconnect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (chatService != null) {
+            chatService.stop();
         }
     }
 

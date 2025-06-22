@@ -1,16 +1,15 @@
+// src/com/example/chat/client/ui/ChatController.java
 package com.example.chat.client.ui;
 
-import com.example.chat.common.Message;
-import com.example.chat.common.MessageType;
-import com.example.chat.client.ChatClient;
-import javafx.application.Platform;
+import com.example.chat.client.service.ChatService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
 /**
- * Controller for the ChatView.fxml. Manages message display and sending.
+ * Controller for ChatView.fxml. Binds the ListView to the service’s ObservableList,
+ * and delegates send/stop actions to ChatService.
  */
 public class ChatController {
     @FXML private ListView<String> messageList;
@@ -18,73 +17,38 @@ public class ChatController {
     @FXML private Button sendButton;
 
     private MainApp mainApp;
-    private ChatClient client;
-    private String username;
-    private volatile boolean running = true;
+    private ChatService chatService;
 
-    /**
-     * Setter for MainApp reference.
-     */
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
 
     /**
-     * Initialize the client and username for this controller.
+     * Called by MainApp immediately after loading this controller.
+     * Binds UI components to the ChatService.
      */
-    public void initClient(ChatClient client, String username) {
-        this.client = client;
-        this.username = username;
+    public void initService(ChatService service) {
+        this.chatService = service;
+        // Bind the messages stream to the ListView
+        messageList.setItems(service.getMessages());
     }
 
-    /**
-     * Start the listener thread to receive messages from the server.
-     */
-    public void startListener() {
-        Thread listener = new Thread(() -> {
-            try {
-                while (running) {
-                    Message msg = client.receive();
-                    if (msg == null) continue;
-                    switch (msg.getType()) {
-                        case PING:
-                            // reply with PONG
-                            client.send(new Message(username, "SERVER", MessageType.PONG, ""));
-                            break;
-                        case PONG:
-                            // ignore
-                            break;
-                        default:
-                            // display message
-                            String formatted = msg.getFrom() + ": " + msg.getBody();
-                            Platform.runLater(() -> messageList.getItems().add(formatted));
-                    }
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }, "client-ui-listener");
-        listener.setDaemon(true);
-        listener.start();
-    }
-
-    /**
-     * Event handler for the Send button and Enter key.
-     */
     @FXML
     private void onSend() {
         String text = inputField.getText().trim();
-        if (text.isEmpty() || client == null) {
-            return;
+        if (!text.isEmpty() && chatService != null) {
+            chatService.sendText(text);
         }
-        client.send(new Message(username, "ALL", MessageType.TEXT, text));
         inputField.clear();
     }
 
     /**
-     * Clean up when the scene is closed or application stops.
+     * If you need to do any cleanup when switching away from this view,
+     * you can call chatService.stop() here (though MainApp.stop will also handle it).
      */
     public void stop() {
-        running = false;
+        if (chatService != null) {
+            chatService.stop();
+        }
     }
 }
