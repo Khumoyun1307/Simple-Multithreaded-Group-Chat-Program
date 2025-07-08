@@ -1,6 +1,12 @@
 package com.example.chat.client.ui;
 
+import com.example.chat.client.auth.repository.FileUserRepository;
 import com.example.chat.client.service.ChatService;
+import com.yourorg.auth.domain.repository.InMemoryUserRepository;
+import com.yourorg.auth.domain.security.Pbkdf2PasswordEncoder;
+import com.yourorg.auth.domain.security.UuidTokenService;
+import com.yourorg.auth.domain.service.AuthManager;
+import com.yourorg.auth.domain.service.AuthManagerImpl;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +20,8 @@ import java.io.IOException;
 public class MainApp extends Application {
     private Stage primaryStage;
     private ChatService chatService;
+    private AuthManager authManager;
+    private String authToken;
 
     private static final String LIGHT = "/css/light.css";
     private static final String DARK  = "/css/dark.css";
@@ -24,25 +32,48 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        // Use file-backed repository implemented in the client module
+        authManager = new AuthManagerImpl(
+                new FileUserRepository(),
+                new Pbkdf2PasswordEncoder(),
+                new UuidTokenService()
+        );
         this.primaryStage.setTitle("Chat Application");
         showLoginView();
     }
 
+    public AuthManager getAuthManager() {
+        return authManager;
+    }
+
+    public void setAuthToken(String token) {
+        this.authToken = token;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     public void showLoginView() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AuthView.fxml"));
             Parent root = loader.load();
-            LoginController controller = loader.getController();
+            AuthController controller = loader.getController();
             controller.setMainApp(this);
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/css/auth.css").toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
         } catch (IOException e) {
-            showAlert("Failed to load Login view:\n" + e.getMessage());
+            showAlert("Failed to load Auth view:\n" + e.getMessage());
         }
     }
 
@@ -74,7 +105,6 @@ public class MainApp extends Application {
 
     public void toggleTheme() {
         darkMode = !darkMode;
-        // Clear both theme sheets, then add the one you want
         chatScene.getStylesheets().removeAll(
                 getClass().getResource(LIGHT).toExternalForm(),
                 getClass().getResource(DARK).toExternalForm()
@@ -86,7 +116,10 @@ public class MainApp extends Application {
 
     public void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.initOwner(primaryStage);
+
+        if (primaryStage.getScene() != null) {
+            alert.initOwner(primaryStage);
+        }
         alert.showAndWait();
     }
 

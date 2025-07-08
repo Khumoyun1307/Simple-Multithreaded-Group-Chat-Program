@@ -48,9 +48,22 @@ public class ChatController {
     @FXML
     private void onSend() {
         String text = inputField.getText().trim();
-        if (!text.isEmpty() && chatService != null) {
+        if (chatService == null || text.isEmpty()) return;
+
+        if (text.startsWith("/secure ")) {
+            String[] parts = text.split("\\s+", 3);
+            if (parts.length < 3) {
+                chatService.getMessages().add("Usage: /secure <user> <message>");
+            } else {
+                chatService.sendSecure(parts[1], parts[2]);
+            }
+        } else if (text.startsWith("/sall ")) {
+            String msg = text.substring(6);
+            chatService.sendSecureGroupMessage(msg);
+        } else {
             chatService.sendText(text);
         }
+
         inputField.clear();
     }
 

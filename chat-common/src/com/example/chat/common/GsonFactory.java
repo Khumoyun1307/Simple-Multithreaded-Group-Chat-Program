@@ -5,12 +5,10 @@ import com.google.gson.GsonBuilder;
 
 import java.time.Instant;
 
-/**
- * Provides a preconfigured Gson instance for client & server.
- */
 public class GsonFactory {
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+            .registerTypeAdapter(MessageType.class, new MessageTypeAdapter())
             .create();
 
     public static Gson getGson() {

@@ -48,6 +48,13 @@ public class ClientSession implements Runnable {
                 switch (msg.getType()) {
                     case TEXT -> ChatManager.getInstance().broadcast(msg);
                     case PING -> sendMessage(new Message("SERVER", username, MessageType.PONG, "PONG"));
+                    case SECURE_TEXT -> {
+                        // Send only to intended recipient
+                        boolean success = ChatManager.getInstance().sendTo(msg.getTo(), msg);
+                        if (!success) {
+                            System.err.println("Failed to route SECURE_TEXT to " + msg.getTo());
+                        }
+                    }
                     default -> {
                         // Other message types can be handled here
                     }

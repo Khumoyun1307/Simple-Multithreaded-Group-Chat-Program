@@ -1,0 +1,124 @@
+/* shared auth styles */
+
+.auth-root {
+  -fx-background-color: linear-gradient(to bottom right, #3b6fd3, #1e47b2);
+}
+
+.auth-card {
+  -fx-background-color: rgba(255,255,255,0.85);
+  -fx-padding: 30 40 30 40;       /* top right bottom left */
+  -fx-spacing: 10;
+  -fx-alignment: center;
+  -fx-background-radius: 8;
+  -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4);
+}
+
+.auth-title {
+  -fx-font-size: 28px;
+  -fx-text-fill: #333333;
+  -fx-font-weight: bold;
+}
+
+.toggle-button {
+  -fx-min-width: 80;
+  -fx-background-radius: 4;
+}
+.toggle-button:selected {
+  -fx-background-color: #3b6fd3;
+  -fx-text-fill: white;
+}
+
+.auth-button {
+  -fx-background-color: #3b6fd3;
+  -fx-text-fill: white;
+  -fx-min-width: 100px;
+  -fx-background-radius: 4;
+}
+
+.auth-button:hover {
+  -fx-background-color: #335bb0;
+}
+
+.bg-shape-1 {
+  -fx-background-color: rgba(255,255,255,0.05);
+  -fx-shape: "M0,0 L600,0 L600,400 L0,400 Z"; /* full card behind */
+}
+
+.bg-shape-2 {
+  -fx-background-color: rgba(255,255,255,0.1);
+  -fx-shape: "M0,0 Q250,200 500,0 L500,350 Q250,150 0,350 Z";
+  -fx-translate-x: 50; -fx-translate-y: 20;
+}
+
+/* Make the entire TabPane background transparent */
+.tab-pane {
+  -fx-background-color: transparent;
+}
+
+/* Remove the default tab‐header background stripe */
+.tab-pane > .tab-header-area > .tab-header-background {
+  -fx-background-color: transparent;
+}
+
+/* Flatten out the header insets so there’s no gray padding */
+.tab-pane > .tab-header-area {
+  -fx-padding: 0;
+  -fx-background-insets: 0;
+}
+
+/* Style each Tab as a “pill” button */
+.tab-pane .tab {
+  -fx-background-color: transparent;     /* default */
+  -fx-background-insets: 0;
+  -fx-padding: 6 12;                     /* top/bottom left/right */
+  -fx-border-radius: 4;
+  -fx-background-radius: 4;
+}
+
+/* Hover state */
+.tab-pane .tab:hover {
+  -fx-background-color: rgba(59,111,211,0.1);
+}
+
+/* Selected tab */
+.tab-pane .tab:selected {
+  -fx-background-color: #3b6fd3;
+}
+
+/* Tab text */
+.tab-pane .tab-label {
+  -fx-text-fill: #333333;
+  -fx-font-size: 14px;
+}
+
+/* Selected tab text */
+.tab-pane .tab:selected .tab-label {
+  -fx-text-fill: white;
+}
+
+/* Hide the content border normally drawn around tabs */
+.tab-pane .tab-content-area {
+  -fx-background-color: transparent;
+  -fx-padding: 0;
+}
+
+/* Remove any inset “double‐background” layers on tabs */
+.tab-pane .tab {
+  /* ensure no extra inset layers */
+  -fx-background-insets: 0;
+  -fx-border-insets: 0;
+  -fx-background-radius: 4;
+  -fx-border-radius: 4;
+}
+
+/* Kill the focus outline entirely */
+.tab-pane .tab:selected {
+  -fx-focus-color: transparent;
+  -fx-faint-focus-color: transparent;
+}
+
+/* For good measure, remove any border around the selected tab */
+.tab-pane .tab:selected {
+  -fx-border-color: transparent;
+  -fx-border-width: 0;
+}

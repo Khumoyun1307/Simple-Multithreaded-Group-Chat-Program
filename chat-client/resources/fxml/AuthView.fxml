@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.chat.client.ui.AuthController"
+           styleClass="auth-root">
+
+    <!-- Background shapes -->
+    <Pane prefWidth="600" prefHeight="400" styleClass="bg-shape-1" mouseTransparent="true"/>
+    <Pane prefWidth="500" prefHeight="350" styleClass="bg-shape-2" mouseTransparent="true"/>
+
+    <!-- Center card -->
+    <VBox styleClass="auth-card" alignment="CENTER" spacing="15">
+        <Label text="ChatApp" styleClass="auth-title"/>
+
+        <TabPane fx:id="modeTab" tabClosingPolicy="UNAVAILABLE" prefWidth="320">
+            <tabs>
+                <Tab text="Log In">
+                    <content>
+                        <VBox spacing="10" style="-fx-padding: 10;">
+                            <TextField fx:id="loginIdField" promptText="Username"/>
+                            <PasswordField fx:id="loginPasswordField" promptText="Password"/>
+                            <Button text="Log In" onAction="#onLogin" styleClass="auth-button" maxWidth="Infinity"/>
+                            <Hyperlink text="Forgot password?" onAction="#onForgotPassword"/>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Sign Up">
+                    <content>
+                        <VBox spacing="10" style="-fx-padding: 10;">
+                            <TextField fx:id="signupUsernameField" promptText="Username"/>
+                            <PasswordField fx:id="signupPasswordField" promptText="Password"/>
+                            <PasswordField fx:id="signupConfirmField" promptText="Confirm Password"/>
+                            <Button text="Sign Up" onAction="#onSignUp" styleClass="auth-button" maxWidth="Infinity"/>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </VBox>
+</StackPane>

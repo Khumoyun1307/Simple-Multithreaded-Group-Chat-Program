@@ -4,6 +4,8 @@
       <root url="file://$PROJECT_DIR$/../../openjfx-24.0.1_windows-x64_bin-sdk/javafx-sdk-24.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../openjfx-24.0.1_windows-x64_bin-sdk/javafx-sdk-24.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../openjfx-24.0.1_windows-x64_bin-sdk/javafx-sdk-24.0.1/lib" />
+      <root url="jar://$PROJECT_DIR$/libs/auth-domain.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/CryptoLib.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

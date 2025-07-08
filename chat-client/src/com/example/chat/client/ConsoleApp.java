@@ -28,7 +28,19 @@ public class ConsoleApp {
                 if (line.equalsIgnoreCase("/quit")) {
                     break;
                 }
-                controller.sendChat(line);
+                if (line.startsWith("/secure ")) {
+                    String[] parts = line.split("\\s+", 3);
+                    if (parts.length < 3) {
+                        System.out.println("Usage: /secure <username> <message>");
+                        continue;
+                    }
+                    controller.sendSecureChat(parts[2], parts[1]);
+                } else if (line.startsWith("/sall ")) {
+                    String message = line.substring(6);
+                    controller.sendSecureGroupMessage(message);
+                } else {
+                    controller.sendChat(line);
+                }
             }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());

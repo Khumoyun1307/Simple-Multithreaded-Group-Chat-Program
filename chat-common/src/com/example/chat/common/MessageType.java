@@ -8,5 +8,6 @@ public enum MessageType {
     JOIN,   // Client has joined
     LEAVE,  // Client has left
     PING,   // Heartbeat request
-    PONG    // Heartbeat response
+    PONG,    // Heartbeat response
+    SECURE_TEXT  // 🔐 Encrypted and signed message
 }
