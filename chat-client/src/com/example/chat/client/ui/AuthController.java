@@ -1,12 +1,9 @@
 package com.example.chat.client.ui;
 
-import com.cipherchat.engine.CryptoException;
-import com.cipherchat.engine.KeyManager;
+import com.example.chat.client.auth.service.AuthUseCase;
 import com.yourorg.auth.domain.model.User;
-import com.yourorg.auth.domain.exception.UserAlreadyExistsException;
-import com.yourorg.auth.domain.exception.InvalidCredentialsException;
 import com.yourorg.auth.domain.exception.AuthException;
-import com.yourorg.auth.domain.service.AuthManager;
+import com.cipherchat.engine.CryptoException;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -17,9 +14,12 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
-import java.security.KeyPair;
 import java.util.ResourceBundle;
 
+/**
+ * UI controller for authentication views. Handles only UI concerns,
+ * delegating business logic to AuthUseCase.
+ */
 public class AuthController implements Initializable {
     @FXML private TextField loginIdField;
     @FXML private PasswordField loginPasswordField;
@@ -30,16 +30,16 @@ public class AuthController implements Initializable {
     @FXML private Hyperlink forgotPasswordLink;
 
     private MainApp mainApp;
-    private AuthManager authManager;
+    private AuthUseCase authUseCase;
 
     public void setMainApp(MainApp app) {
         this.mainApp = app;
-        this.authManager = app.getAuthManager();
+        this.authUseCase = new AuthUseCase(app.getAuthManager());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Optionally style or configure controls here
+        // No business logic here
     }
 
     @FXML
@@ -51,7 +51,7 @@ public class AuthController implements Initializable {
             return;
         }
         try {
-            String token = authManager.login(username, pwd);
+            String token = authUseCase.login(username, pwd);
             mainApp.setAuthToken(token);
             mainApp.showChatView("localhost", 1234, username);
         } catch (AuthException e) {
@@ -75,25 +75,15 @@ public class AuthController implements Initializable {
         }
 
         try {
-            // 1. Register user
-            User user = authManager.register(username, pwd);
-
-            // 2. Generate and save key pair
-            KeyPair keyPair = KeyManager.generateRSAKeyPair();
-            KeyManager.saveKeyPair(username, keyPair);
-
-            // 3. Show success
+            User user = authUseCase.signUp(username, pwd);
             Alert info = new Alert(Alert.AlertType.INFORMATION,
                     "Sign Up Successful!\nYour User ID is: " + user.getId(),
                     ButtonType.OK);
             info.setHeaderText("Sign Up Successful");
             info.initOwner(mainApp.getPrimaryStage());
             info.showAndWait();
-
-            // 4. Prefill login
             loginIdField.setText(user.getUsername());
             loginPasswordField.clear();
-
         } catch (AuthException e) {
             mainApp.showAlert(e.getMessage());
         } catch (CryptoException e) {

@@ -1,4 +1,4 @@
-package com.example.chat.client;
+package com.example.chat.client.core;
 
 import com.example.chat.common.GsonFactory;
 import com.example.chat.common.Message;

@@ -1,8 +1,8 @@
 package com.example.chat.client.ui;
 
 import com.example.chat.client.auth.repository.FileUserRepository;
-import com.example.chat.client.service.ChatService;
-import com.yourorg.auth.domain.repository.InMemoryUserRepository;
+import com.example.chat.client.ui.chat.adapters.ChatServiceFX;
+import com.example.chat.client.ui.chat.controllers.ChatController;
 import com.yourorg.auth.domain.security.Pbkdf2PasswordEncoder;
 import com.yourorg.auth.domain.security.UuidTokenService;
 import com.yourorg.auth.domain.service.AuthManager;
@@ -19,7 +19,6 @@ import java.io.IOException;
 
 public class MainApp extends Application {
     private Stage primaryStage;
-    private ChatService chatService;
     private AuthManager authManager;
     private String authToken;
 
@@ -32,14 +31,14 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        // Use file-backed repository implemented in the client module
+        // Initialize AuthManager (unchanged)
         authManager = new AuthManagerImpl(
                 new FileUserRepository(),
                 new Pbkdf2PasswordEncoder(),
                 new UuidTokenService()
         );
-        this.primaryStage.setTitle("Chat Application");
-        showLoginView();
+        primaryStage.setTitle("Chat Application");
+        showAuthView();
     }
 
     public AuthManager getAuthManager() {
@@ -58,12 +57,12 @@ public class MainApp extends Application {
         return primaryStage;
     }
 
-    public void showLoginView() {
+    private void showAuthView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AuthView.fxml"));
             Parent root = loader.load();
-            AuthController controller = loader.getController();
-            controller.setMainApp(this);
+            AuthController authController = loader.getController();
+            authController.setMainApp(this);
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
@@ -79,16 +78,15 @@ public class MainApp extends Application {
 
     public void showChatView(String host, int port, String username) {
         try {
-            // 1) Create and start the service
-            chatService = new ChatService(host, port, username);
-            chatService.start();
+            // 1) Initialize JavaFX adapter for core chat logic
+            ChatServiceFX chatService = new ChatServiceFX(host, port, username);
 
             // 2) Load the Chat.fxml and wire the controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ChatView.fxml"));
             Parent root = loader.load();
             ChatController controller = loader.getController();
             controller.setMainApp(this);
-            controller.initService(chatService);
+            controller.initService(host, port, username);
 
             // 3) Apply stylesheets (base + default theme)
             chatScene = new Scene(root);
@@ -116,7 +114,6 @@ public class MainApp extends Application {
 
     public void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-
         if (primaryStage.getScene() != null) {
             alert.initOwner(primaryStage);
         }
@@ -125,9 +122,7 @@ public class MainApp extends Application {
 
     @Override
     public void stop() {
-        if (chatService != null) {
-            chatService.stop();
-        }
+        // Nothing to stop here, UI adapter handles disconnect in controller
     }
 
     public static void main(String[] args) {

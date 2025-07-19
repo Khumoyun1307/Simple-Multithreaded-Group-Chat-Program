@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.chat.client.ui.ChatController"
+            fx:controller="com.example.chat.client.ui.chat.controllers.ChatController"
             styleClass="root-pane">
 
     <!-- Top bar with theme toggle -->

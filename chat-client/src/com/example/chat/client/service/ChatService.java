@@ -1,6 +1,6 @@
 package com.example.chat.client.service;
 
-import com.example.chat.client.ChatClient;
+import com.example.chat.client.core.ChatClient;
 import com.example.chat.common.GsonFactory;
 import com.example.chat.common.Message;
 import com.example.chat.common.MessageType;
@@ -22,9 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;

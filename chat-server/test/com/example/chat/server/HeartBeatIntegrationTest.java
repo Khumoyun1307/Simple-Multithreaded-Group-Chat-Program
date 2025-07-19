@@ -3,7 +3,7 @@ package com.example.chat.server;
 
 import com.example.chat.common.Message;
 import com.example.chat.common.MessageType;
-import com.example.chat.client.ChatClient;
+import com.example.chat.client.core.ChatClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
