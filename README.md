@@ -20,8 +20,8 @@ A Java-based group chat application featuring a multithreaded server and both GU
 - **JavaFX SDK** if not bundled with your JDK (for GUI client).
 - Third-party JARs in `libs/`:
   - `com.google.gson_2.11.0.jar`
-  - `CryptoLib.jar`
-  - `auth-domain.jar`
+  - `CryptoLib.jar` *(You can find it [here](https://github.com/Khumoyun1307/Crypto-Message-App))
+  - `auth-domain.jar` (You can find it here[](https://github.com/Khumoyun1307/Authentication-App))
 
 ## Project Structure
 
